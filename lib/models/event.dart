@@ -22,4 +22,8 @@ class BoothEvent {
     required this.guestUploadsEnabled,
     required this.sendGalleryTomorrow,
   });
+
+  String get displayDate {
+    return "${eventDate.month}/${eventDate.day}/${eventDate.year}";
+  }
 }
