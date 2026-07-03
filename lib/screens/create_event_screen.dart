@@ -1,7 +1,8 @@
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../models/event.dart';
-import '../services/event_service.dart';
+import '../providers/event_provider.dart';
 import '../widgets/primary_button.dart';
 import 'device_selection_screen.dart';
 
@@ -48,7 +49,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     super.dispose();
   }
 
-  void createEvent() {
+  Future<void> createEvent() async {
     final event = BoothEvent(
       id: "MB-${DateTime.now().millisecondsSinceEpoch}",
       eventName: eventNameController.text.trim(),
@@ -62,14 +63,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       sendGalleryTomorrow: sendGalleryTomorrow,
     );
 
-    context.read<EventService>().addEvent(event);
+    await context.read<EventProvider>().addEvent(event);
 
-   Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-    builder: (_) => DeviceSelectionScreen(event: event),
-  ),
-);
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DeviceSelectionScreen(event: event),
+      ),
+    );
   }
 
   @override
@@ -93,9 +96,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 25),
-
                 TextField(
                   controller: eventNameController,
                   decoration: const InputDecoration(
@@ -103,9 +104,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 TextField(
                   controller: customerNameController,
                   decoration: const InputDecoration(
@@ -113,9 +112,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 TextField(
                   controller: customerEmailController,
                   decoration: const InputDecoration(
@@ -123,9 +120,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 DropdownButtonFormField<String>(
                   value: selectedOccasion,
                   decoration: const InputDecoration(
@@ -144,9 +139,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     });
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 DropdownButtonFormField<String>(
                   value: selectedLayout,
                   decoration: const InputDecoration(
@@ -165,9 +158,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     });
                   },
                 ),
-
                 const SizedBox(height: 24),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -203,7 +194,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
                   ],
                 ),
-
                 SwitchListTile(
                   title: const Text("Allow Guest Uploads"),
                   value: guestUploadsEnabled,
@@ -213,7 +203,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     });
                   },
                 ),
-
                 SwitchListTile(
                   title: const Text("Send Gallery Tomorrow"),
                   value: sendGalleryTomorrow,
@@ -223,9 +212,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     });
                   },
                 ),
-
                 const SizedBox(height: 30),
-
                 PrimaryButton(
                   text: "Continue",
                   icon: Icons.arrow_forward,

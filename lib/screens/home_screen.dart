@@ -1,8 +1,8 @@
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/event.dart';
-import '../services/event_service.dart';
+import '../providers/event_provider.dart';
 import '../widgets/primary_button.dart';
 import 'create_event_screen.dart';
 import 'settings_screen.dart';
@@ -17,8 +17,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-   final eventService = context.watch<EventService>();
-final List<BoothEvent> events = eventService.events;
+    final eventProvider = context.watch<EventProvider>();
+    final List<BoothEvent> events = eventProvider.events;
 
     return Scaffold(
       appBar: AppBar(
@@ -33,9 +33,7 @@ final List<BoothEvent> events = eventService.events;
               size: 90,
               color: Colors.deepPurple,
             ),
-
             const SizedBox(height: 20),
-
             const Text(
               "Welcome to MyBooth",
               style: TextStyle(
@@ -43,33 +41,25 @@ final List<BoothEvent> events = eventService.events;
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               "Capture Every Memory",
               style: TextStyle(fontSize: 18),
             ),
-
             const SizedBox(height: 30),
-
             PrimaryButton(
               text: "Start New Event",
               icon: Icons.add_circle_outline,
-              onPressed: () async {
-                await Navigator.push(
+              onPressed: () {
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => const CreateEventScreen(),
                   ),
                 );
-
-                setState(() {});
               },
             ),
-
             const SizedBox(height: 15),
-
             PrimaryButton(
               text: "Settings",
               icon: Icons.settings,
@@ -82,9 +72,7 @@ final List<BoothEvent> events = eventService.events;
                 );
               },
             ),
-
             const SizedBox(height: 35),
-
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -95,9 +83,7 @@ final List<BoothEvent> events = eventService.events;
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
-
             Expanded(
               child: events.isEmpty
                   ? const Center(
@@ -123,7 +109,14 @@ final List<BoothEvent> events = eventService.events;
                             subtitle: Text(
                               "${event.occasion} • ${event.displayDate}",
                             ),
-                            trailing: const Icon(Icons.arrow_forward_ios),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () {
+                                context
+                                    .read<EventProvider>()
+                                    .deleteEvent(event);
+                              },
+                            ),
                           ),
                         );
                       },

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/event_provider.dart';
 import 'screens/home_screen.dart';
-import 'services/event_service.dart';
 import 'themes/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final eventProvider = EventProvider();
+  await eventProvider.loadEvents();
+
   runApp(
     ChangeNotifierProvider(
-      create: (_) => EventService(),
+      create: (_) => eventProvider,
       child: const MyBoothApp(),
     ),
   );
