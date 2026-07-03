@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'screens/home_screen.dart';
+import 'services/event_service.dart';
 import 'themes/app_theme.dart';
 
 void main() {
-  runApp(const MyBoothApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => EventService(),
+      child: const MyBoothApp(),
+    ),
+  );
 }
 
 class MyBoothApp extends StatelessWidget {

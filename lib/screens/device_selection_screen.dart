@@ -65,7 +65,7 @@ class DeviceSelectionScreen extends StatelessWidget {
                 icon: const Icon(Icons.qr_code_2),
                 label: const Text("Display Station"),
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (_) => DisplayScreen(eventId: event.id),

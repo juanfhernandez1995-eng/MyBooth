@@ -26,4 +26,34 @@ class BoothEvent {
   String get displayDate {
     return "${eventDate.month}/${eventDate.day}/${eventDate.year}";
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "eventName": eventName,
+      "customerName": customerName,
+      "customerEmail": customerEmail,
+      "occasion": occasion,
+      "eventDate": eventDate.toIso8601String(),
+      "photoLayout": photoLayout,
+      "printCopies": printCopies,
+      "guestUploadsEnabled": guestUploadsEnabled,
+      "sendGalleryTomorrow": sendGalleryTomorrow,
+    };
+  }
+
+  factory BoothEvent.fromJson(Map<String, dynamic> json) {
+    return BoothEvent(
+      id: json["id"],
+      eventName: json["eventName"],
+      customerName: json["customerName"],
+      customerEmail: json["customerEmail"],
+      occasion: json["occasion"],
+      eventDate: DateTime.parse(json["eventDate"]),
+      photoLayout: json["photoLayout"],
+      printCopies: json["printCopies"],
+      guestUploadsEnabled: json["guestUploadsEnabled"],
+      sendGalleryTomorrow: json["sendGalleryTomorrow"],
+    );
+  }
 }

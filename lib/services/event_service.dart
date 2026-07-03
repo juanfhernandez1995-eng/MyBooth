@@ -1,17 +1,26 @@
+import 'package:flutter/material.dart';
 import '../models/event.dart';
 
-class EventService {
-  static final List<BoothEvent> _events = [];
+class EventService extends ChangeNotifier {
+  final List<BoothEvent> _events = [];
 
-  static List<BoothEvent> getEvents() {
-    return _events;
-  }
+  List<BoothEvent> get events => List.unmodifiable(_events);
 
-  static void addEvent(BoothEvent event) {
+  void addEvent(BoothEvent event) {
     _events.add(event);
+    notifyListeners();
   }
 
-  static void deleteEvent(BoothEvent event) {
+  void deleteEvent(BoothEvent event) {
     _events.remove(event);
+    notifyListeners();
+  }
+
+  BoothEvent? getEventById(String id) {
+    try {
+      return _events.firstWhere((event) => event.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 }
