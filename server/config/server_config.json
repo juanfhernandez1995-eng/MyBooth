@@ -1,0 +1,18 @@
+{
+  "host": "0.0.0.0",
+  "port": 8080,
+  "booth_network_host": "192.168.4.1",
+  "booth_network_port": 8080,
+  "server_name": "MyBooth Server",
+  "version": "v0.20",
+  "event_storage_dir": "storage/events",
+  "gallery_storage_dir": "storage/gallery",
+  "asset_storage_dir": "storage/assets",
+  "template_storage_dir": "storage/templates",
+  "modules": {
+    "camera": "Canon EOS R50",
+    "printer": "DNP DS-RX1HS",
+    "ai_engine": "AI Background Engine",
+    "gallery": "Local Gallery Storage"
+  }
+}
