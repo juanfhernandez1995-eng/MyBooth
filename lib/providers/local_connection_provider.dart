@@ -57,6 +57,19 @@ class LocalConnectionProvider extends ChangeNotifier {
     await applyPreset(LocalConnection.boothRouterPreset);
   }
 
+
+  Future<void> useLastSuccessfulServerAddress() async {
+    final currentConnection = _connection ?? LocalConnection.defaultConnection();
+
+    _isLoading = true;
+    notifyListeners();
+
+    _connection = await _service.useLastSuccessfulServerAddress(currentConnection);
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Future<void> testConnection() async {
     final currentConnection = _connection ?? LocalConnection.defaultConnection();
 

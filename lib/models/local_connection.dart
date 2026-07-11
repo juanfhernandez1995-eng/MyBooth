@@ -41,6 +41,8 @@ class LocalConnection {
   final int? moduleCount;
   final int? responseTimeMs;
   final String? lastError;
+  final String? lastSuccessfulServerIp;
+  final int? lastSuccessfulServerPort;
 
   const LocalConnection({
     required this.serverIp,
@@ -53,6 +55,8 @@ class LocalConnection {
     this.moduleCount,
     this.responseTimeMs,
     this.lastError,
+    this.lastSuccessfulServerIp,
+    this.lastSuccessfulServerPort,
   });
 
   factory LocalConnection.defaultConnection() {
@@ -60,7 +64,7 @@ class LocalConnection {
       serverIp: '192.168.4.1',
       serverPort: 8080,
       state: LocalConnectionState.configured,
-      message: 'Booth router preset prepared. Start the laptop server and run a real handshake.',
+      message: 'Booth router preset prepared. This is only a starting point. Use the laptop IPv4 address from ipconfig if your router assigns a different address.',
     );
   }
 
@@ -83,8 +87,8 @@ class LocalConnection {
 
   static const LocalConnectionPreset boothRouterPreset = LocalConnectionPreset(
     type: LocalConnectionPresetType.boothRouter,
-    name: 'Booth Router',
-    description: 'Use for the private MyBooth Wi-Fi router once the laptop server is on the booth network.',
+    name: 'Booth Router Example',
+    description: 'Starter preset only. Your real router may assign the laptop a different IPv4 address.',
     serverIp: '192.168.4.1',
     serverPort: 8080,
   );
@@ -102,6 +106,26 @@ class LocalConnection {
 
   bool get isChecking => state == LocalConnectionState.checking;
 
+  bool get hasLastSuccessfulServerAddress {
+    return lastSuccessfulServerIp != null &&
+        lastSuccessfulServerIp!.trim().isNotEmpty &&
+        lastSuccessfulServerPort != null &&
+        lastSuccessfulServerPort! > 0;
+  }
+
+  String get lastSuccessfulEndpoint {
+    if (!hasLastSuccessfulServerAddress) {
+      return 'No successful booth server address saved yet.';
+    }
+    return 'http://$lastSuccessfulServerIp:$lastSuccessfulServerPort';
+  }
+
+  bool get isUsingLastSuccessfulAddress {
+    return hasLastSuccessfulServerAddress &&
+        serverIp == lastSuccessfulServerIp &&
+        serverPort == lastSuccessfulServerPort;
+  }
+
   LocalConnectionPresetType get activePresetType {
     if (serverIp == laptopTestPreset.serverIp && serverPort == laptopTestPreset.serverPort) {
       return LocalConnectionPresetType.laptopTest;
@@ -113,11 +137,15 @@ class LocalConnection {
   }
 
   String get activePresetLabel {
+    if (isUsingLastSuccessfulAddress) {
+      return 'Last Successful';
+    }
+
     switch (activePresetType) {
       case LocalConnectionPresetType.laptopTest:
         return 'Laptop Test';
       case LocalConnectionPresetType.boothRouter:
-        return 'Booth Router';
+        return 'Booth Router Example';
       case LocalConnectionPresetType.custom:
         return 'Custom Address';
     }
@@ -169,6 +197,16 @@ class LocalConnection {
     return '$activePresetLabel • $endpoint';
   }
 
+  String get routerPairingTip {
+    if (isConnected) {
+      return 'This address worked. MyBooth will remember it as the last successful server address.';
+    }
+    if (hasLastSuccessfulServerAddress) {
+      return 'Last successful address: $lastSuccessfulEndpoint. Use it if the router has not changed the laptop IP.';
+    }
+    return 'Run ipconfig on the laptop and use the Wi-Fi IPv4 Address. The router preset is only an example.';
+  }
+
   LocalConnection copyWith({
     String? serverIp,
     int? serverPort,
@@ -180,8 +218,11 @@ class LocalConnection {
     int? moduleCount,
     int? responseTimeMs,
     String? lastError,
+    String? lastSuccessfulServerIp,
+    int? lastSuccessfulServerPort,
     bool clearServerMetadata = false,
     bool clearLastError = false,
+    bool clearLastSuccessfulServerAddress = false,
   }) {
     return LocalConnection(
       serverIp: serverIp ?? this.serverIp,
@@ -194,6 +235,12 @@ class LocalConnection {
       moduleCount: clearServerMetadata ? null : moduleCount ?? this.moduleCount,
       responseTimeMs: clearServerMetadata ? null : responseTimeMs ?? this.responseTimeMs,
       lastError: clearLastError ? null : lastError ?? this.lastError,
+      lastSuccessfulServerIp: clearLastSuccessfulServerAddress
+          ? null
+          : lastSuccessfulServerIp ?? this.lastSuccessfulServerIp,
+      lastSuccessfulServerPort: clearLastSuccessfulServerAddress
+          ? null
+          : lastSuccessfulServerPort ?? this.lastSuccessfulServerPort,
     );
   }
 }

@@ -11,9 +11,9 @@ The Flutter app remains the tablet/customer/operator interface. The gaming lapto
 - event session storage
 - private Wi-Fi tablet connection
 
-## Current scope: v0.20
+## Current scope: v0.21
 
-This release keeps the standard-library server skeleton and adds template designer metadata planning. It does not control real hardware yet.
+This release keeps the standard-library server skeleton and adds router pairing metadata for real tablet-to-laptop booth testing. It does not control real hardware yet.
 
 ## Run locally
 
@@ -30,10 +30,10 @@ Default address:
 http://127.0.0.1:8080
 ```
 
-For booth use, the future laptop private-Wi-Fi IP is expected to be:
+For booth use, the laptop private-Wi-Fi IP must come from `ipconfig`. A common example is:
 
 ```text
-http://192.168.4.1:8080
+http://LAPTOP-IP:8080
 ```
 
 ## Endpoints
@@ -89,3 +89,16 @@ The default guest QR target is the final bordered/composited session gallery. Ra
 `GET /assets/template-designer-plan` returns the editable template design rules used by the Flutter Template Designer foundation.
 
 The server-side rule matches the booth product rule: guest QR, gallery, print, and future Google Photos export should use final bordered/composited outputs. Raw Canon originals remain operator-only.
+
+
+## v0.21 Router Pairing Route
+
+`GET /pairing/router-field-plan` returns the real-world router pairing rules used by the Flutter Server Pairing screen.
+
+Important field-test rules:
+
+- Use the laptop Wi-Fi IPv4 Address from `ipconfig`.
+- Do not use `0.0.0.0` or `127.0.0.1` from the tablet.
+- Keep Python/MyBooth Server running on port `8080`.
+- If testing Flutter Web from the tablet, allow port `5000`.
+- If the tablet cannot reach the laptop, check Windows Firewall and router client/AP isolation.

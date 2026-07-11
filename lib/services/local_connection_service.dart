@@ -9,6 +9,8 @@ import '../models/local_connection.dart';
 class LocalConnectionService {
   static const String _serverIpKey = 'mybooth_server_ip';
   static const String _serverPortKey = 'mybooth_server_port';
+  static const String _lastSuccessfulServerIpKey = 'mybooth_last_successful_server_ip';
+  static const String _lastSuccessfulServerPortKey = 'mybooth_last_successful_server_port';
   static const Duration _requestTimeout = Duration(seconds: 3);
 
   const LocalConnectionService();
@@ -19,6 +21,8 @@ class LocalConnectionService {
 
     final serverIp = preferences.getString(_serverIpKey) ?? defaultConnection.serverIp;
     final serverPort = preferences.getInt(_serverPortKey) ?? defaultConnection.serverPort;
+    final lastSuccessfulServerIp = preferences.getString(_lastSuccessfulServerIpKey);
+    final lastSuccessfulServerPort = preferences.getInt(_lastSuccessfulServerPortKey);
 
     return LocalConnection(
       serverIp: serverIp,
@@ -26,7 +30,9 @@ class LocalConnectionService {
       state: serverIp.trim().isEmpty ? LocalConnectionState.notConfigured : LocalConnectionState.configured,
       message: serverIp.trim().isEmpty
           ? 'Enter the laptop server IP address before pairing.'
-          : 'Server address saved. Start the laptop server, then run Pair with Server.',
+          : 'Server address saved. Use the laptop IPv4 address from ipconfig, then run Pair with Server.',
+      lastSuccessfulServerIp: lastSuccessfulServerIp,
+      lastSuccessfulServerPort: lastSuccessfulServerPort,
     );
   }
 
@@ -36,6 +42,8 @@ class LocalConnectionService {
   }) async {
     final preferences = await SharedPreferences.getInstance();
     final trimmedIp = serverIp.trim();
+    final lastSuccessfulServerIp = preferences.getString(_lastSuccessfulServerIpKey);
+    final lastSuccessfulServerPort = preferences.getInt(_lastSuccessfulServerPortKey);
 
     await preferences.setString(_serverIpKey, trimmedIp);
     await preferences.setInt(_serverPortKey, serverPort);
@@ -48,6 +56,25 @@ class LocalConnectionService {
           ? 'Server address cleared. Enter the laptop IP address before pairing.'
           : 'Connection settings saved. Run Pair with Server to confirm the route.',
       lastError: null,
+      lastSuccessfulServerIp: lastSuccessfulServerIp,
+      lastSuccessfulServerPort: lastSuccessfulServerPort,
+    );
+  }
+
+  Future<LocalConnection> useLastSuccessfulServerAddress(LocalConnection connection) async {
+    if (!connection.hasLastSuccessfulServerAddress) {
+      return connection.copyWith(
+        state: LocalConnectionState.failed,
+        message: 'No successful server address has been saved yet. Pair with the laptop server once first.',
+        lastChecked: DateTime.now(),
+        lastError: 'Missing last successful server address.',
+        clearServerMetadata: true,
+      );
+    }
+
+    return saveConnection(
+      serverIp: connection.lastSuccessfulServerIp!,
+      serverPort: connection.lastSuccessfulServerPort!,
     );
   }
 
@@ -83,16 +110,22 @@ class LocalConnectionService {
         );
       }
 
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString(_lastSuccessfulServerIpKey, connection.serverIp);
+      await preferences.setInt(_lastSuccessfulServerPortKey, connection.serverPort);
+
       final modules = statusPayload['modules'];
 
       return connection.copyWith(
         state: LocalConnectionState.connected,
-        message: 'Paired with the laptop server. The tablet reached /health and /status successfully.',
+        message: 'Paired with the laptop server. MyBooth saved this as the last successful server address.',
         lastChecked: DateTime.now(),
         serverName: _stringValue(statusPayload['serverName']) ?? _stringValue(healthPayload['server_name']) ?? 'MyBooth Server',
         serverVersion: _stringValue(statusPayload['version']) ?? _stringValue(healthPayload['version']),
         moduleCount: modules is List ? modules.length : null,
         responseTimeMs: stopwatch.elapsedMilliseconds,
+        lastSuccessfulServerIp: connection.serverIp,
+        lastSuccessfulServerPort: connection.serverPort,
         clearLastError: true,
       );
     } on TimeoutException {

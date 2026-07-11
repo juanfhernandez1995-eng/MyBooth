@@ -61,6 +61,14 @@ class ConnectionStatusCard extends StatelessWidget {
                   color: const Color(0xFF6B7280),
                 ),
           ),
+          const SizedBox(height: 8),
+          Text(
+            effectiveConnection.routerPairingTip,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: effectiveConnection.isConnected ? Colors.green : const Color(0xFF6B7280),
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
           if (effectiveConnection.lastError != null && effectiveConnection.lastError!.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(

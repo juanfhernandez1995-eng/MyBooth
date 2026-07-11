@@ -95,6 +95,32 @@ def handle_get(path: str, config: ServerConfig, handler) -> None:
         return
 
 
+
+    if path == '/pairing/router-field-plan':
+        json_response(handler, {
+            'routerPairingPlan': {
+                'sourceOfTruth': 'Use the laptop Wi-Fi IPv4 Address from ipconfig.',
+                'defaultPresetWarning': '192.168.4.1 is only a starter example. The AX1500 router may assign a different laptop IP.',
+                'requiredPorts': [8080, 5000],
+                'addressesToAvoidOnTablet': ['127.0.0.1', '0.0.0.0'],
+                'recommendedSteps': [
+                    'Connect laptop and Android tablet to the same booth router Wi-Fi.',
+                    'Start the laptop Python server with py -m mybooth_server.',
+                    'Run ipconfig on the laptop and copy the Wi-Fi IPv4 Address.',
+                    'Enter that IPv4 address and port 8080 in Server Pairing.',
+                    'Run Pair with Server and save the successful address.',
+                ],
+                'lastSuccessfulAddressRule': 'The Flutter client stores the last address that passed a real /health and /status handshake.',
+                'troubleshooting': [
+                    'Allow Python through Windows Defender Firewall on private networks.',
+                    'Allow port 5000 if testing Flutter Web from the tablet.',
+                    'Turn off AP/client/guest isolation if the tablet cannot reach the laptop.',
+                ],
+            },
+            'timestampUtc': utc_now_iso(),
+        })
+        return
+
     if path == '/booth/session-review-plan':
         json_response(handler, {
             'sessionReviewPlan': {
@@ -136,6 +162,32 @@ def handle_post(path: str, body: dict[str, Any], config: ServerConfig, handler) 
         })
         return
 
+
+
+    if path == '/pairing/router-field-plan':
+        json_response(handler, {
+            'routerPairingPlan': {
+                'sourceOfTruth': 'Use the laptop Wi-Fi IPv4 Address from ipconfig.',
+                'defaultPresetWarning': '192.168.4.1 is only a starter example. The AX1500 router may assign a different laptop IP.',
+                'requiredPorts': [8080, 5000],
+                'addressesToAvoidOnTablet': ['127.0.0.1', '0.0.0.0'],
+                'recommendedSteps': [
+                    'Connect laptop and Android tablet to the same booth router Wi-Fi.',
+                    'Start the laptop Python server with py -m mybooth_server.',
+                    'Run ipconfig on the laptop and copy the Wi-Fi IPv4 Address.',
+                    'Enter that IPv4 address and port 8080 in Server Pairing.',
+                    'Run Pair with Server and save the successful address.',
+                ],
+                'lastSuccessfulAddressRule': 'The Flutter client stores the last address that passed a real /health and /status handshake.',
+                'troubleshooting': [
+                    'Allow Python through Windows Defender Firewall on private networks.',
+                    'Allow port 5000 if testing Flutter Web from the tablet.',
+                    'Turn off AP/client/guest isolation if the tablet cannot reach the laptop.',
+                ],
+            },
+            'timestampUtc': utc_now_iso(),
+        })
+        return
 
     if path == '/booth/session-review-plan':
         json_response(handler, {
